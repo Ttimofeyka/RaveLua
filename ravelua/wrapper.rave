@@ -1,0 +1,12 @@
+namespace lua {
+    alias multRet = -1;
+
+    extern(linkname: "luaL_newstate") void* newState();
+    extern(linkname: "luaL_openlibs") void openLibs(void* ptr);
+    extern(linkname: "luaL_loadfilex") int loadFileX(void* ptr, char* fname, char* mode);
+    (inline) int loadFile(void* ptr, char* fname) => lua::loadFileX(ptr, fname, null);
+    extern(linkname: "lua_pcallk") int pcallk(void* ptr, int nargs, int nresults, int msgh, void* ctx, void* k);
+    (inline) int pcall(void* ptr, int f1, int retType, int f2) => lua::pcallk(ptr, f1, retType, f2, 0, null);
+    extern(linkname: "lua_close") void close(void* ptr);
+    (inline) int doFile(void* ptr, char* filename) => (lua::loadFile(ptr, filename) || lua::pcall(ptr, 0, lua::multRet, 0));
+}
